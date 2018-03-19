@@ -1,0 +1,102 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage[brazilian]{babel}
+\usepackage{minted}
+\usepackage{natbib}
+\usepackage{graphicx}
+
+\title{Agente inteligente para o jogo Gomoku}
+\author{Lucas Pedro Bordignon \and Ranieri Schroeder Althoff}
+\date{\today}
+
+
+\begin{document}
+
+\maketitle
+
+\section{Gomoku}
+There is a theory which states that if ever anyone discovers exactly what the Universe is for and why it is here, it will instantly disappear and be replaced by something even more bizarre and inexplicable.
+There is another theory which states that this has already happened.
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics[scale=1.5]{gomoku}
+  \caption{Tabuleiro do jogo}
+  \label{fig:gomoku}
+\end{figure}
+
+\section{Abordagem}
+Dado que o jogo depende de dois agentes para progredir (no nosso caso, um humano, e uma máquina), podemos modelar o
+grafo que representa o jogo da seguinte forma:
+
+\begin{itemize}
+  \item Cada nodo do grafo representa a situação atual do tabuleiro, em determinado momento do jogo
+  \item Cada nodo indica quem é o próximo a jogar
+  \item Cada aresta representa uma jogada, ou seja, uma mudança no estado do tabuleiro
+\end{itemize}
+
+\section{Algoritmo MiniMax}
+O algoritmo a ser utilizado para o agente, utilizando o conceito de podas alpha-beta, em linhas gerais, é o seguinte:
+
+\begin{minted}[escapeinside=||,mathescape=true]{python}
+  def min_max_with_pruning(
+                          node,
+                          beta = +|$\infty$|,
+                          alpha = -|$\infty$|):
+      # Realiza a poda
+      if(beta <= alpha):
+          return
+
+      # Nodos folha
+      if(node.children.size == 0):
+        node.weight = utility_function(node)
+        return
+
+      # Segue a busca nos nodos filhos
+      for children in node:
+          min_max_with_pruning(children, beta, alpha)
+          if(node.turn == 'Human'):
+              beta = node.weight if(node.weight < beta)
+          elif(node.turn == 'Machine'):
+              alpha = node.weight if(node.weight > alpha)
+\end{minted}
+
+\section{Performance e otimizações}
+
+\section{Heurística e Função de utilidade}
+  \subsection {Funcão de utilidade}
+    A função de utilidade deve levar em consideração diversas combinações de jogadas e disposições das peças
+    no tabuleiro do jogo, bem como o resultado de uma sequência de jogadas. Em nosso agente, para situações de
+    vitória, empate e derrota, o resultado da função recebe um acréscimo ou decréscimo, baseado no resultado do jogo.
+
+    Consequentemente, quando tivermos uma vitória, somamos a quantidade de espaços vazios deixados no tabuleiro ao
+    resultado, dado que quanto menor a quantidade de movimentos necessários para uma vitória, melhor é esse conjunto
+    de jogadas. No caso de uma derrota, descontamos a quantidade de espaços vazios, pois uma derrota forçando o
+    adversário a melhorar e tomar a melhor decisão em cada rodada é mais vantajosa do que uma simples derrota
+    rápida, com o tabuleiro quase vazio.
+
+    Além disso, a função modela situações que favorecem mais a máquina (agente) em uma menor quantidade de jogadas.
+    Por exemplo, é mais vantajoso para o mesmo possuir uma sequência de três peças no tabuleiro(tripla) do que $n$
+    sequências de duas peças(dupla), dado que uma tripla está mais próximo da vitória, independente do valor de $n$.
+
+
+  \subsection {Heurística}
+    A cada jogada, uma nova peça é inserida no tabuleiro, sendo ela ou do humano, ou da máquina. Para termos uma
+    estimativa que nos informe o quão perto estamos do final do jogo, diversas maneiras foram discutidas e a
+    heurística que mais se aproxima da realidade é a seguinte:
+    \begin{itemize}
+      \item A cada nova peça, encontra-se as peças pertencentes a máquina
+      \item Para cada uma delas, podemos calcular quais sequências pode ser geradas, possuindo espaço entre as peças
+      ou não
+      \item Soma-se assim a quantidade de duplas, a quantidade de triplas e a quantidade de quadras que a maquina
+      possui, atribuindo um peso a cada uma dessas categorias
+      \item Ao término desse cálculo, realizamos o mesmo cálculo e descontamos a quantidade de duplas, triplas e
+      quadruplas de nosso adversário
+    \end{itemize}
+
+    Ao final desse cálculo, obtemos um valor numérico, utilizado para a tomada de decisão sobre a melhor jogada a ser
+    feita em sua próxima rodada.
+
+\bibliographystyle{plain}
+\bibliography{references}
+\end{document}
