@@ -15,8 +15,9 @@
 \maketitle
 
 \section{Gomoku}
-There is a theory which states that if ever anyone discovers exactly what the Universe is for and why it is here, it will instantly disappear and be replaced by something even more bizarre and inexplicable.
-There is another theory which states that this has already happened.
+Gomoku, também conhecido como jogo ligue cinco, consiste em, um tabuleiro 15x15, montar uma sequência de 5 peças na
+vertical, horizontal ou diagonal, sendo que jogador executa um
+movimento por rodada. A Figura \ref{fig:gomoku} mostra um exemplo do tabuleiro do Gomoku.
 
 \begin{figure}[h!]
   \centering
@@ -61,7 +62,6 @@ O algoritmo a ser utilizado para o agente, utilizando o conceito de podas alpha-
               alpha = node.weight if(node.weight > alpha)
 \end{minted}
 
-\section{Performance e otimizações}
 
 \section{Heurística e Função de utilidade}
   \subsection {Funcão de utilidade}
@@ -79,24 +79,60 @@ O algoritmo a ser utilizado para o agente, utilizando o conceito de podas alpha-
     Por exemplo, é mais vantajoso para o mesmo possuir uma sequência de três peças no tabuleiro(tripla) do que $n$
     sequências de duas peças(dupla), dado que uma tripla está mais próximo da vitória, independente do valor de $n$.
 
+    Realizando algunas cálculos, descobrimos que o máximo número de duplas que um jogador consegue realizar, sem
+    montar uma tripla, gira em torno de 150. Além disso, a quantidade de triplas possíveis, sem gerar quadras, é
+    aproximadamente 95. Logo, nossa função de utilidade é a seguinte:
+    \vspace{.5em}
+    $\textbf{f()} = (d + (150 \times t) + (95 \times q)) + (r \times e)$
+    \vspace{.5em}
+
+    Aonde \textbf{$d$} é o número de duplas que a máquina possui, \textbf{$t$} a quantidade de triplas e
+    \textbf{$q$} a quantidade de quadras. Além disso, \textbf{$e$} equivale a quantidade de espaços vazios no tabuleiro
+    do jogo. Já \textbf{$r$} significa o resultado final do jogo, sendo dado pela seguinte relação:
+
+    \vspace{.5em}
+    $
+    \textbf{r} = \left\{\begin{array}{lr}
+            100, & \text{vitória}\\
+            -100, & \text{derrota}\\
+            0, & \text{empate}
+            \end{array}}
+    $
 
   \subsection {Heurística}
     A cada jogada, uma nova peça é inserida no tabuleiro, sendo ela ou do humano, ou da máquina. Para termos uma
     estimativa que nos informe o quão perto estamos do final do jogo, diversas maneiras foram discutidas e a
     heurística que mais se aproxima da realidade é a seguinte:
+
     \begin{itemize}
-      \item A cada nova peça, encontra-se as peças pertencentes a máquina
+      \item A cada nova jogada, encontra-se as peças pertencentes a máquina
       \item Para cada uma delas, podemos calcular quais sequências pode ser geradas, possuindo espaço entre as peças
       ou não
       \item Soma-se assim a quantidade de duplas, a quantidade de triplas e a quantidade de quadras que a maquina
       possui, atribuindo um peso a cada uma dessas categorias
       \item Ao término desse cálculo, realizamos o mesmo cálculo e descontamos a quantidade de duplas, triplas e
-      quadruplas de nosso adversário
+      quadruplas de nosso adversário, utilizando um certo peso
     \end{itemize}
 
     Ao final desse cálculo, obtemos um valor numérico, utilizado para a tomada de decisão sobre a melhor jogada a ser
-    feita em sua próxima rodada.
+    feita em sua próxima rodada. Descontando o número de duplas, triplas e quadras que nosso adversário possui nos
+    auxilia a saber se uma jogada é boa ou não para o agente.
 
-\bibliographystyle{plain}
-\bibliography{references}
+    Matematicamente, pode ser representada pela função:
+
+    \vspace{.5em}
+    $\textbf{f()} = (d + (150 \times t) + (95 \times q)) + w \times ((d_2 + (150 \times t_2) + (95 \times q_2)))$
+    \vspace{.5em}
+
+    Aonde cada uma dessas variaveis possuem o mesmo significado da função de utilidade, aonde $d_2$, $t_2$ e $q_2$
+    indicam as sequências do adversário, bem como \textbf{$w$} um peso a ser definido.
+
+\section{Performance e otimizações}
+  Para que tenhamos um melhor desempenho ao implementar a heuristica e sua devida função de utilidade, podemos
+  focar na busca apenas nas regiões aonde possuímos peças.
+
+  Além disso, podemos sempre tentar realizar a busca através do algoritmo MiniMax com poda sempre pelos nodos com
+  maior valor, dado que um maior número de podas será realizado. Assim, reduzimos o espaço de busca e focamos
+  somente nos casos que podem nos retornar um resultado melhor.
+
 \end{document}
