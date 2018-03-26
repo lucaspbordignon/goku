@@ -1,3 +1,4 @@
+import re
 from constants import *
 from pdb import *
 
@@ -10,7 +11,7 @@ class Gomoku:
     def __init__(self):
         self._board = INITIAL_BOARD
         self._menu = INITIAL_MENU
-        self._running = True
+        self._winner = None
         self._players = {
             0: 'X',
             1: 'O',
@@ -32,10 +33,14 @@ class Gomoku:
             if self.game_mode != 0 : self._start_game(self.game_mode)
 
     def _start_game(self, mode=1):
-        while self._running:
+        while not self._winner:
             move = self._render_game(mode)
-            self._mark_board(self._actual_player, move)
+            if not self._mark_board(self._actual_player, move):
+                print('Position already in use!')
+                continue
             self._toggle_player()
+            self._winner = self._game_finished()
+        print('We have a winner')
 
     def _render_menu(self):
         print('Welcome to the awesome Gomoku game!')
@@ -67,7 +72,9 @@ class Gomoku:
         self._actual_player = 0 if self._actual_player else 1
 
     def _mark_board(self, player, position):
+        if self._board[position] != '.': return False
         self._board[position] = self._players[self._actual_player]
+        return True
 
     def _game_finished(self):
         return self._check_row() \
@@ -77,20 +84,26 @@ class Gomoku:
     def _check_row(self):
         """
             Checks if the board is finished. i.e. some player has made
-            5 in a row
+            5 in a row.
+            Returns the symbol of the winner player, if there is one
         """
-        pass
+        match = None
+        for row in self._board:
+            row_string = ''.join(row)
+            match = re.search(r'([X]{5})|([O]{5})|([G]{5})', row_string)
+            if match: return match.group()[0]
+        return None
 
     def _check_column(self):
         """
             Checks if the board is finished. i.e. some player has made
             5 in a column
         """
-        pass
+        return None
 
     def _check_diagonal(self):
         """
             Checks if the board is finished. i.e. some player has made
             5 in a diagonal
         """
-        pass
+        return None
