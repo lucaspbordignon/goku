@@ -9,3 +9,4 @@ INITIAL_MENU = {
 }
 
 INITIAL_BOARD = np.full((BOARD_SIZE, BOARD_SIZE), '.')
+WIN_REGEX = r'([X]{5})|([O]{5})|([G]{5})'

@@ -90,7 +90,7 @@ class Gomoku:
         match = None
         for row in self._board:
             row_string = ''.join(row)
-            match = re.search(r'([X]{5})|([O]{5})|([G]{5})', row_string)
+            match = re.search(WIN_REGEX, row_string)
             if match: return match.group()[0]
         return None
 
@@ -98,7 +98,12 @@ class Gomoku:
         """
             Checks if the board is finished. i.e. some player has made
             5 in a column
+            Returns the symbol of the winner player, if there is one
         """
+        for column in np.transpose(self._board):
+            col_string = ''.join(column)
+            match = re.search(WIN_REGEX, col_string)
+            if match: return match.group()[0]
         return None
 
     def _check_diagonal(self):
