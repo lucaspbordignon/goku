@@ -111,4 +111,16 @@ class Gomoku:
             Checks if the board is finished. i.e. some player has made
             5 in a diagonal
         """
+        # Search for the first direction
+        index = - (BOARD_SIZE + 1)
+        while index < BOARD_SIZE:
+            diagonal_string = ''.join(self._board.diagonal(index))
+            match = re.search(WIN_REGEX, diagonal_string)
+            if match: return match.group()[0]
+            index += 1
+
+        # Search for the other direction
+        index = - (BOARD_SIZE + 1)
+        # TODO
+
         return None
