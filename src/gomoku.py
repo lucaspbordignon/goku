@@ -1,6 +1,10 @@
+from constants import INITIAL_BOARD
+from constants import INITIAL_MENU
+from constants import BOARD_SIZE
+from constants import WIN_REGEX
+
+import numpy as np
 import re
-from constants import *
-from pdb import *
 
 
 class Gomoku:
@@ -26,11 +30,13 @@ class Gomoku:
         try:
             self._render_menu()
             self.game_mode = int(input('>>> '))
-            if self.game_mode != 0 : self._start_game(self.game_mode)
+            if self.game_mode != 0:
+                self._start_game(self.game_mode)
         except ValueError:
             print('The given option was not a number')
             self.game_mode = int(input('>>> '))
-            if self.game_mode != 0 : self._start_game(self.game_mode)
+            if self.game_mode != 0:
+                self._start_game(self.game_mode)
 
     def _start_game(self, mode=1):
         while not self._winner:
@@ -72,7 +78,8 @@ class Gomoku:
         self._actual_player = 0 if self._actual_player else 1
 
     def _mark_board(self, player, position):
-        if self._board[position] != '.': return False
+        if self._board[position] != '.':
+            return False
         self._board[position] = self._players[self._actual_player]
         return True
 
@@ -91,7 +98,8 @@ class Gomoku:
         for row in self._board:
             row_string = ''.join(row)
             match = re.search(WIN_REGEX, row_string)
-            if match: return match.group()[0]
+            if match:
+                return match.group()[0]
         return None
 
     def _check_column(self):
@@ -103,7 +111,8 @@ class Gomoku:
         for column in np.transpose(self._board):
             col_string = ''.join(column)
             match = re.search(WIN_REGEX, col_string)
-            if match: return match.group()[0]
+            if match:
+                return match.group()[0]
         return None
 
     def _check_diagonal(self):
@@ -116,11 +125,17 @@ class Gomoku:
         while index < BOARD_SIZE:
             diagonal_string = ''.join(self._board.diagonal(index))
             match = re.search(WIN_REGEX, diagonal_string)
-            if match: return match.group()[0]
+            if match:
+                return match.group()[0]
             index += 1
 
         # Search for the other direction
         index = - (BOARD_SIZE + 1)
-        # TODO
+        while index < BOARD_SIZE:
+            diagonal_string = ''.join(self._board.diagonal(index))
+            match = re.search(WIN_REGEX, diagonal_string)
+            if match:
+                return match.group()[0]
+            index += 1
 
         return None
