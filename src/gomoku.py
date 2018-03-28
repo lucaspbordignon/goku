@@ -131,8 +131,9 @@ class Gomoku:
 
         # Search for the other direction
         index = - (BOARD_SIZE + 1)
+        flipped_board = np.fliplr(self._board)
         while index < BOARD_SIZE:
-            diagonal_string = ''.join(self._board.diagonal(index))
+            diagonal_string = ''.join(flipped_board.diagonal(index))
             match = re.search(WIN_REGEX, diagonal_string)
             if match:
                 return match.group()[0]
