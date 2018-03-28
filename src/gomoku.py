@@ -26,26 +26,29 @@ class Gomoku:
     def run(self):
         self.render()
 
-    def render(self):
+    def render(self, skip_menu=False):
         try:
-            self._render_menu()
+            if not skip_menu:
+                self._render_menu()
             self.game_mode = int(input('>>> '))
             if self.game_mode != 0:
                 self._start_game(self.game_mode)
         except ValueError:
-            print('The given option was not a number')
-            self.game_mode = int(input('>>> '))
-            if self.game_mode != 0:
-                self._start_game(self.game_mode)
+            print('\nThe given option was not a number!')
+            self.render(skip_menu=True)
 
     def _start_game(self, mode=1):
         while not self._winner:
-            move = self._render_game(mode)
-            if not self._mark_board(self._actual_player, move):
-                print('Position already in use!')
-                continue
-            self._toggle_player()
-            self._winner = self._game_finished()
+            try:
+                move = self._render_game(mode)
+                if not self._mark_board(self._actual_player, move):
+                    print('Position already in use or out of the board!')
+                    continue
+                self._toggle_player()
+                self._winner = self._game_finished()
+            except ValueError:
+                print('\nOption(s) is(are) not number(s). Try again!')
+                self._winner = False
         print('We have a winner')
 
     def _render_menu(self):
@@ -73,20 +76,6 @@ class Gomoku:
         for i in range(len(self._board)):
             print(i, end='  ') if i < 10 else print(i, end=' ')
         print()
-
-    def _toggle_player(self):
-        self._actual_player = 0 if self._actual_player else 1
-
-    def _mark_board(self, player, position):
-        if self._board[position] != '.':
-            return False
-        self._board[position] = self._players[self._actual_player]
-        return True
-
-    def _game_finished(self):
-        return self._check_row() \
-                or self._check_column() \
-                or self._check_diagonal()
 
     def _check_row(self):
         """
@@ -140,3 +129,24 @@ class Gomoku:
             index += 1
 
         return None
+
+    def _toggle_player(self):
+        self._actual_player = 0 if self._actual_player else 1
+
+    def _mark_board(self, player, position):
+        if not self._valid_position(position) or self._board[position] != '.':
+            return False
+        self._board[position] = self._players[self._actual_player]
+        return True
+
+    def _game_finished(self):
+        return self._check_row() \
+                or self._check_column() \
+                or self._check_diagonal()
+
+    def _valid_position(self, position):
+        x_coord, y_coord = position
+        if 0 <= x_coord <= BOARD_SIZE:
+            if 0 <= y_coord <= BOARD_SIZE:
+                return True
+        return False
