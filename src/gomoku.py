@@ -4,7 +4,7 @@ from constants import BOARD_SIZE
 from constants import WIN_REGEX
 
 import numpy as np
-import re
+import regex as re
 
 
 class Gomoku:
