@@ -10,8 +10,12 @@ class Goku:
     pruning
     """
 
-    def __init__(self, board):
-        self._board = board
+    def next_move(self, board):
+        """
+            Makes the search and returns the coordinates for the best move
+        found. Should be the only function to be called externally.
+        """
+        pass
 
     def search(self, state, max_level=3):
         """
@@ -23,7 +27,16 @@ class Goku:
             4 - Make the pruning when needed
             5 - After compute 'all' the possibilities, return the next movement
         """
-        pass
+        # if beta <= alpha: PODA
+        if max_level == 0:
+            # node.value = self.heuristic()
+            pass
+
+        for movement in self.all_movement_possibilities(state.board):
+            next_node_state = state
+            next_node_state.board[movement] = state.player
+            next_node_state.player = 'G' if state.player == 'X' else 'X'
+            self.search(next_node_state, max_level=(max_level - 1))
 
     def heuristic(self, state):
         postive_factor = (self.find_doubles('G') +
@@ -38,18 +51,21 @@ class Goku:
     def utility(self, state):
         pass
 
-    def find_doubles(self, symbol):
+    def all_movement_possibilities(self, board):
+        pass
+
+    def find_doubles(self, symbol, board):
         doubles = 0
 
         # Search for the rows
-        for row in self._board:
+        for row in board:
             row_string = ''.join(row)
             doubles += len(re.findall(r'[' + symbol + r']{2}',
                            row_string,
                            overlapped=True))
 
         # Search for the columns
-        for column in np.transpose(self._board):
+        for column in np.transpose(board):
             col_string = ''.join(column)
             doubles += len(re.findall(r'[' + symbol + r']{2}',
                            col_string,
@@ -58,7 +74,7 @@ class Goku:
         # Search for the first diagonal direction
         index = - (BOARD_SIZE + 1)
         while index < BOARD_SIZE:
-            diagonal_string = ''.join(self._board.diagonal(index))
+            diagonal_string = ''.join(board.diagonal(index))
             doubles += len(re.findall(r'[' + symbol + r']{2}',
                            diagonal_string,
                            overlapped=True))
@@ -66,7 +82,7 @@ class Goku:
 
         # Search for the other direction
         index = - (BOARD_SIZE + 1)
-        flipped_board = np.fliplr(self._board)
+        flipped_board = np.fliplr(board)
         while index < BOARD_SIZE:
             diagonal_string = ''.join(flipped_board.diagonal(index))
             doubles += len(re.findall(r'[' + symbol + r']{2}',
@@ -75,8 +91,76 @@ class Goku:
             index += 1
         return doubles
 
-    def find_triples(self, symbol):
-        pass
+    def find_triples(self, symbol, board):
+        triples = 0
 
-    def find_quartets(self, symbol):
-        pass
+        # Search for the rows
+        for row in board:
+            row_string = ''.join(row)
+            triples += len(re.findall(r'[' + symbol + r']{3}',
+                           row_string,
+                           overlapped=True))
+
+        # Search for the columns
+        for column in np.transpose(board):
+            col_string = ''.join(column)
+            triples += len(re.findall(r'[' + symbol + r']{3}',
+                           col_string,
+                           overlapped=True))
+
+        # Search for the first diagonal direction
+        index = - (BOARD_SIZE + 1)
+        while index < BOARD_SIZE:
+            diagonal_string = ''.join(board.diagonal(index))
+            triples += len(re.findall(r'[' + symbol + r']{3}',
+                           diagonal_string,
+                           overlapped=True))
+            index += 1
+
+        # Search for the other direction
+        index = - (BOARD_SIZE + 1)
+        flipped_board = np.fliplr(board)
+        while index < BOARD_SIZE:
+            diagonal_string = ''.join(flipped_board.diagonal(index))
+            triples += len(re.findall(r'[' + symbol + r']{3}',
+                           diagonal_string,
+                           overlapped=True))
+            index += 1
+        return triples
+
+    def find_quartets(self, symbol, board):
+        quartets = 0
+
+        # Search for the rows
+        for row in board:
+            row_string = ''.join(row)
+            quartets += len(re.findall(r'[' + symbol + r']{4}',
+                            row_string,
+                            overlapped=True))
+
+        # Search for the columns
+        for column in np.transpose(board):
+            col_string = ''.join(column)
+            quartets += len(re.findall(r'[' + symbol + r']{4}',
+                            col_string,
+                            overlapped=True))
+
+        # Search for the first diagonal direction
+        index = - (BOARD_SIZE + 1)
+        while index < BOARD_SIZE:
+            diagonal_string = ''.join(board.diagonal(index))
+            quartets += len(re.findall(r'[' + symbol + r']{4}',
+                            diagonal_string,
+                            overlapped=True))
+            index += 1
+
+        # Search for the other direction
+        index = - (BOARD_SIZE + 1)
+        flipped_board = np.fliplr(board)
+        while index < BOARD_SIZE:
+            diagonal_string = ''.join(flipped_board.diagonal(index))
+            quartets += len(re.findall(r'[' + symbol + r']{4}',
+                            diagonal_string,
+                            overlapped=True))
+            index += 1
+        return quartets
