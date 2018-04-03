@@ -144,7 +144,4 @@ class Gomoku:
 
     def _valid_position(self, position):
         x_coord, y_coord = position
-        if 0 <= x_coord <= BOARD_SIZE:
-            if 0 <= y_coord <= BOARD_SIZE:
-                return True
-        return False
+        return 0 <= x_coord <= BOARD_SIZE and 0 <= y_coord <= BOARD_SIZE
