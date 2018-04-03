@@ -3,13 +3,15 @@ import numpy as np
 import regex as re
 
 
+# TODO: Return the position for the next move, not only the heuristic value
+
+
 class Goku:
     """
         Implements the AI agent for the gomoku game. It uses the minimax
     algorithm to find the best option for the next move, using alpha-beta
     pruning
     """
-
     def next_move(self, board):
         """
             Makes the search and returns the coordinates for the best move
@@ -17,42 +19,58 @@ class Goku:
         """
         pass
 
-    def search(self, state, max_level=3):
+    def minimax(self, board, alpha, beta, current_player='G', max_level=3):
         """
-            1 - Makes a depth-first-search till raise the max_level of the tree
-            2 - When got to the max_level, computes the heuristic(because
-            the game is not finished yet, probably)
-            3 - Recursively updates the parent nodes alha/beta with the right
-            values
-            4 - Make the pruning when needed
-            5 - After compute 'all' the possibilities, return the next movement
+            Minimax algorith with alpha-beta prunning. Must return not only the
+        node value, but the next movement coordinates.
         """
-        # if beta <= alpha: PODA
+        # Leaf node
         if max_level == 0:
-            # node.value = self.heuristic()
-            pass
+            return self.heuristic(board)
 
-        for movement in self.all_movement_possibilities(state.board):
-            next_node_state = state
-            next_node_state.board[movement] = state.player
-            next_node_state.player = 'G' if state.player == 'X' else 'X'
-            self.search(next_node_state, max_level=(max_level - 1))
-
-    def heuristic(self, state):
-        postive_factor = (self.find_doubles('G') +
-                          150 * self.find_triples('G') +
-                          95 * self.find_quartets('G'))
-        negative_factor = (self.find_doubles('X') +
-                           150 * self.find_triples('X') +
-                           95 * self.find_quartets('X'))
-
-        return postive_factor - 0.5 * negative_factor
-
-    def utility(self, state):
-        pass
+        if current_player == 'G':
+            # TODO: Change this value to '- infinity'
+            value = -100000
+            for next_board, movement in self.all_movement_possibilities(board):
+                print('A')
+                value = max(value, self.minimax(next_board,
+                                                alpha,
+                                                beta,
+                                                'X',
+                                                max_level - 1))
+                alpha = max(value, alpha)
+                # Cutting off
+                if alpha > beta:
+                    break
+            return value
+        else:
+            # TODO: Change this value to '+ infinity'
+            value = 1000000000
+            for next_board, movement in self.all_movement_possibilities(board):
+                value = min(value, self.minimax(next_board,
+                                                alpha,
+                                                beta,
+                                                'G',
+                                                max_level - 1))
+                alpha = min(value, alpha)
+                # Cutting off
+                if alpha > beta:
+                    break
+            return value
 
     def all_movement_possibilities(self, board):
-        pass
+        for item in np.argwhere(board == '.'):
+            yield tuple(item)
+
+    def heuristic(self, board):
+        postive_factor = (self.find_doubles('G', board) +
+                          150 * self.find_triples('G', board) +
+                          95 * self.find_quartets('G', board))
+        negative_factor = (self.find_doubles('X', board) +
+                           150 * self.find_triples('X', board) +
+                           95 * self.find_quartets('X', board))
+
+        return postive_factor - 0.5 * negative_factor
 
     def find_doubles(self, symbol, board):
         doubles = 0
