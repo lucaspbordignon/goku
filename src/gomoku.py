@@ -11,7 +11,7 @@ class Gomoku:
         It should not have any AI related functionality.
     """
     def __init__(self):
-        self._board = INITIAL_BOARD
+        self._board = np.copy(INITIAL_BOARD)
         self._menu = INITIAL_MENU
         self._winner = None
         self._players = {
