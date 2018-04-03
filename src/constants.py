@@ -1,6 +1,5 @@
 import numpy as np
 
-
 BOARD_SIZE = 15
 EXIT = 'get out'
 INITIAL_MENU = {

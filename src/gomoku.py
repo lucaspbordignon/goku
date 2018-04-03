@@ -1,10 +1,8 @@
-from constants import INITIAL_BOARD
-from constants import INITIAL_MENU
-from constants import BOARD_SIZE
-from constants import WIN_REGEX
 
 import numpy as np
 import regex as re
+
+from constants import BOARD_SIZE, INITIAL_BOARD, INITIAL_MENU, WIN_REGEX
 
 
 class Gomoku:
