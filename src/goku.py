@@ -72,8 +72,7 @@ class Goku:
             return self.heuristic(board)
 
         if current_player == 'G':
-            # TODO: Change this value to '- infinity'
-            value = -100000
+            value = -math.inf
             for next_board, movement in self.all_movement_possibilities(board):
                 print('A')
                 value = max(value, self.minimax(next_board,
@@ -87,8 +86,7 @@ class Goku:
                     break
             return value
         else:
-            # TODO: Change this value to '+ infinity'
-            value = 1000000000
+            value = math.inf
             for next_board, movement in self.all_movement_possibilities(board):
                 value = min(value, self.minimax(next_board,
                                                 alpha,
