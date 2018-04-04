@@ -1,5 +1,4 @@
 import math
-
 import numpy as np
 
 from constants import BOARD_SIZE
@@ -10,7 +9,6 @@ def window(iterable, size):
         yield iterable[i:i + size]
 
 
-# TODO: Return the position for the next move, not only the heuristic value
 def find(length, symbol, board):
     pattern = np.array([symbol] * length)
 
@@ -42,11 +40,14 @@ def find(length, symbol, board):
 def find_doubles(symbol, board):
     return find(2, symbol, board)
 
+
 def find_triples(symbol, board):
     return find(3, symbol, board)
 
+
 def find_quartets(symbol, board):
     return find(4, symbol, board)
+
 
 class Goku:
     """
@@ -73,8 +74,9 @@ class Goku:
 
         if current_player == 'G':
             value = -math.inf
-            for next_board, movement in self.all_movement_possibilities(board):
-                print('A')
+            for movement in self.all_movement_possibilities(board):
+                next_board = np.copy(board)
+                next_board[movement] = current_player
                 value = max(value, self.minimax(next_board,
                                                 alpha,
                                                 beta,
@@ -82,20 +84,22 @@ class Goku:
                                                 max_level - 1))
                 alpha = max(value, alpha)
                 # Cutting off
-                if alpha > beta:
+                if beta <= alpha:
                     break
             return value
         else:
             value = math.inf
-            for next_board, movement in self.all_movement_possibilities(board):
+            for movement in self.all_movement_possibilities(board):
+                next_board = np.copy(board)
+                next_board[movement] = current_player
                 value = min(value, self.minimax(next_board,
                                                 alpha,
                                                 beta,
                                                 'G',
                                                 max_level - 1))
-                alpha = min(value, alpha)
+                beta = min(value, alpha)
                 # Cutting off
-                if alpha > beta:
+                if beta <= alpha:
                     break
             return value
 
