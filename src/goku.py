@@ -1,7 +1,6 @@
 import math
 
 import numpy as np
-
 from constants import BOARD_SIZE
 
 
@@ -20,8 +19,9 @@ def find(length, symbol, board):
                    for c in window(row, length))
 
     def count_diag(board):
+        edge = BOARD_SIZE - length
         return sum(np.array_equal(c, pattern)
-                   for i in range(-(BOARD_SIZE - length), (BOARD_SIZE - length) + 1)
+                   for i in range(-edge, edge + 1)
                    for c in window(board.diagonal(i), length))
 
     return (
@@ -42,11 +42,14 @@ def find(length, symbol, board):
 def find_doubles(symbol, board):
     return find(2, symbol, board)
 
+
 def find_triples(symbol, board):
     return find(3, symbol, board)
 
+
 def find_quartets(symbol, board):
     return find(4, symbol, board)
+
 
 class Goku:
     """

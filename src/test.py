@@ -1,5 +1,4 @@
 import unittest
-from pprint import pprint
 
 import goku
 from gomoku import Gomoku
