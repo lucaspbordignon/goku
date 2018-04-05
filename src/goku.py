@@ -61,49 +61,68 @@ class Goku:
             Makes the search and returns the coordinates for the best move
         found. Should be the only function to be called externally.
         """
-        pass
+        value, position = self.minimax(board)
+        return position
 
-    def minimax(self, board, alpha, beta, current_player='G', max_level=3):
+    def minimax(self, board, alpha=-math.inf, beta=math.inf, current_player='G', max_level=3):
         """
             Minimax algorith with alpha-beta prunning. Must return not only the
         node value, but the next movement coordinates.
         """
+        #print(board)
+        best_movement = ()
+
         # Leaf node
         if max_level == 0:
-            return self.heuristic(board)
+            return (self.heuristic(board), ())
 
         if current_player == 'G':
             value = -math.inf
             for movement in self.all_movement_possibilities(board):
                 next_board = np.copy(board)
                 next_board[movement] = current_player
-                minimax = self.minimax(next_board,
-                                       alpha,
-                                       beta,
-                                       'X',
-                                       max_level - 1)
-                value = max(value, minimax)
+                minimax, _ = self.minimax(next_board,
+                                          alpha,
+                                          beta,
+                                          'X',
+                                          max_level - 1)
+                #print(minimax)
+                if minimax > value:
+                    value = minimax
+                    best_movement = movement
+                # value = max(value, minimax)
                 alpha = max(value, alpha)
+                #print('value: {}, alpha: {}, beta: {}'.format(value, alpha, beta))
+
                 # Cutting off
                 if beta <= alpha:
+                    #print('Podou')
                     break
-            return value
+                #print('não podou')
+            return value, best_movement
         else:
             value = math.inf
             for movement in self.all_movement_possibilities(board):
                 next_board = np.copy(board)
                 next_board[movement] = current_player
-                minimax = self.minimax(next_board,
-                                       alpha,
-                                       beta,
-                                       'X',
-                                       max_level - 1)
-                value = min(value, minimax)
+                minimax, _ = self.minimax(next_board,
+                                          beta,
+                                          alpha,
+                                          'G',
+                                          max_level - 1)
+                if minimax < value:
+                    value = minimax
+                    best_movement = movement
+                # value = min(value, minimax)
                 beta = min(value, beta)
+                #print('value: {}, alpha: {}, beta: {}'.format(value, alpha, beta))
+
                 # Cutting off
                 if beta <= alpha:
+                    #print('Podou')
                     break
-            return value
+                #print('não podou')
+            return value, best_movement
 
     def all_movement_possibilities(self, board):
         for item in np.argwhere(board == '.'):

@@ -1,8 +1,8 @@
-
 import numpy as np
 import regex as re
 
 from constants import BOARD_SIZE, INITIAL_BOARD, INITIAL_MENU, WIN_REGEX
+from goku import Goku
 
 
 class Gomoku:
@@ -28,7 +28,7 @@ class Gomoku:
         try:
             if not skip_menu:
                 self._render_menu()
-            self.game_mode = int(input('>>> '))
+                self.game_mode = int(input('>>> '))
             if self.game_mode != 0:
                 self._start_game(self.game_mode)
         except ValueError:
@@ -36,17 +36,38 @@ class Gomoku:
             self.render(skip_menu=True)
 
     def _start_game(self, mode=1):
-        while not self._winner:
-            try:
-                move = self._render_game(mode)
-                if not self._mark_board(self._actual_player, move):
-                    print('Position already in use or out of the board!')
-                    continue
-                self._toggle_player()
-                self._winner = self._game_finished()
-            except ValueError:
-                print('\nOption(s) is(are) not number(s). Try again!')
-                self._winner = False
+        if mode == 2:
+            goku = Goku()
+            while not self._winner:
+                try:
+                    self._render_board()
+                    print('IT IS GOKU TIME')
+                    move = goku.next_move(self._board)
+                    self._mark_board(2, move)
+                    if self._game_finished():
+                        break
+
+                    # Human
+                    move = self._render_game(mode)
+                    if not self._mark_board(self._actual_player, move):
+                        print('Position already in use or out of the board!')
+                        continue
+                    self._winner = self._game_finished()
+                except ValueError:
+                    print('\nOption(s) is(are) not number(s). Try again!')
+                    self._winner = False
+        else:
+            while not self._winner:
+                try:
+                    move = self._render_game(mode)
+                    if not self._mark_board(self._actual_player, move):
+                        print('Position already in use or out of the board!')
+                        continue
+                    self._toggle_player()
+                    self._winner = self._game_finished()
+                except ValueError:
+                    print('\nOption(s) is(are) not number(s). Try again!')
+                    self._winner = False
         print('We have a winner')
 
     def _render_menu(self):
@@ -134,7 +155,7 @@ class Gomoku:
     def _mark_board(self, player, position):
         if not self._valid_position(position) or self._board[position] != '.':
             return False
-        self._board[position] = self._players[self._actual_player]
+        self._board[position] = self._players[player]
         return True
 
     def _game_finished(self):

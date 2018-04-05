@@ -5,6 +5,7 @@ EXIT = 'get out'
 INITIAL_MENU = {
     0: 'Exit',
     1: 'Play Human vs Human',
+    2: 'Play Human vs AI (Goku)'
 }
 
 INITIAL_BOARD = np.full((BOARD_SIZE, BOARD_SIZE), '.')
