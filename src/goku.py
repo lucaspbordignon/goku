@@ -77,11 +77,12 @@ class Goku:
             for movement in self.all_movement_possibilities(board):
                 next_board = np.copy(board)
                 next_board[movement] = current_player
-                value = max(value, self.minimax(next_board,
-                                                alpha,
-                                                beta,
-                                                'X',
-                                                max_level - 1))
+                minimax = self.minimax(next_board,
+                                       alpha,
+                                       beta,
+                                       'X',
+                                       max_level - 1)
+                value = max(value, minimax)
                 alpha = max(value, alpha)
                 # Cutting off
                 if beta <= alpha:
@@ -92,12 +93,13 @@ class Goku:
             for movement in self.all_movement_possibilities(board):
                 next_board = np.copy(board)
                 next_board[movement] = current_player
-                value = min(value, self.minimax(next_board,
-                                                alpha,
-                                                beta,
-                                                'G',
-                                                max_level - 1))
-                beta = min(value, alpha)
+                minimax = self.minimax(next_board,
+                                       alpha,
+                                       beta,
+                                       'X',
+                                       max_level - 1)
+                value = min(value, minimax)
+                beta = min(value, beta)
                 # Cutting off
                 if beta <= alpha:
                     break
