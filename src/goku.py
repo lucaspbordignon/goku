@@ -49,6 +49,10 @@ def find_quartets(symbol, board):
     return find(4, symbol, board)
 
 
+def find_all_pieces(symbol, board):
+    return len(np.where(board == symbol))
+
+
 class Goku:
     """
         Implements the AI agent for the gomoku game. It uses the minimax
@@ -56,20 +60,23 @@ class Goku:
     pruning
     """
 
-    def next_move(self, board):
+    def next_move(self, board, max_level=3):
         """
             Makes the search and returns the coordinates for the best move
         found. Should be the only function to be called externally.
         """
-        value, position = self.minimax(board)
+        value, position = self.minimax(board, max_level=max_level)
         return position
 
-    def minimax(self, board, alpha=-math.inf, beta=math.inf, current_player='G', max_level=3):
+    def minimax(self, board,
+                alpha=-math.inf,
+                beta=math.inf,
+                current_player='G',
+                max_level=3):
         """
             Minimax algorith with alpha-beta prunning. Must return not only the
         node value, but the next movement coordinates.
         """
-        #print(board)
         best_movement = ()
 
         # Leaf node
@@ -86,19 +93,14 @@ class Goku:
                                           beta,
                                           'X',
                                           max_level - 1)
-                #print(minimax)
                 if minimax > value:
                     value = minimax
                     best_movement = movement
-                # value = max(value, minimax)
                 alpha = max(value, alpha)
-                #print('value: {}, alpha: {}, beta: {}'.format(value, alpha, beta))
 
                 # Cutting off
                 if beta <= alpha:
-                    #print('Podou')
                     break
-                #print('não podou')
             return value, best_movement
         else:
             value = math.inf
@@ -113,15 +115,11 @@ class Goku:
                 if minimax < value:
                     value = minimax
                     best_movement = movement
-                # value = min(value, minimax)
                 beta = min(value, beta)
-                #print('value: {}, alpha: {}, beta: {}'.format(value, alpha, beta))
 
                 # Cutting off
                 if beta <= alpha:
-                    #print('Podou')
                     break
-                #print('não podou')
             return value, best_movement
 
     def all_movement_possibilities(self, board):
@@ -136,4 +134,5 @@ class Goku:
                            150 * find_triples('X', board) +
                            95 * find_quartets('X', board))
 
-        return postive_factor - 0.5 * negative_factor
+        adversarial_pieces = find_all_pieces('X', board)/(BOARD_SIZE**2)
+        return postive_factor - adversarial_pieces * negative_factor
