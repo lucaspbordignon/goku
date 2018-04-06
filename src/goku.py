@@ -269,8 +269,8 @@ def minimax(board, depth, maximizing, player, alpha=-math.inf, beta=math.inf):
         return best_value, best_move
 
 
-def _next_move(board, max_level=1):
-    value, position = minimax(board, max_level, True, 'G')
+def _next_move(board, depth):
+    value, position = minimax(board, depth, True, 'G')
     return position
 
 
@@ -285,7 +285,7 @@ class Goku:
         self._transposition_table = TranspositionTable()
 
     @timed
-    def next_move(self, board, max_level=1):
+    def next_move(self, board, max_level=3):
         """
             Makes the search and returns the coordinates for the best move
         found. Should be the only function to be called externally.
