@@ -40,7 +40,7 @@ class Gomoku:
     def _start_game(self, mode=1):
         # Starting with the AI
         if mode == 2:
-            self._actual_player = 2
+            self._actual_player = 0
 
         while not self._winner:
             try:
