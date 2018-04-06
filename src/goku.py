@@ -219,36 +219,41 @@ def minimax(board, depth, maximizing, player, alpha=-math.inf, beta=math.inf):
         Minimax algorith with alpha-beta prunning. Must return not only the
     node value, but the next movement coordinates.
     """
-    best_move = ()
     # Leaf node
     if depth == 0:
         return (_evaluate(board, player, OPPONENT_MAP[player]), ())
 
     # if current_player == 'G':
     if maximizing:
-        value = -math.inf
+        best_move, best_value = tuple(), -math.inf
         for position, state in _possible_next_moves(board, 'G'):
             new_value, _ = minimax(state, depth - 1, False, 'X', alpha, beta)
-            if new_value > value:
-                value, best_move = new_value, position
-            alpha = max(value, alpha)
+
+            if new_value > best_value:
+                best_move, best_value = position, new_value
+
+            alpha = max(alpha, best_value)
 
             # Cutting off
             if beta <= alpha:
                 break
-        return value, best_move
+
+        return best_value, best_move
     else:
-        value = math.inf
+        best_move, best_value = tuple(), math.inf
         for position, state in _possible_next_moves(board, 'X'):
             new_value, _ = minimax(state, depth - 1, True, 'G', alpha, beta)
-            if new_value < value:
-                value, best_move = new_value, position
-            beta = min(value, beta)
+
+            if new_value > best_value:
+                best_move, best_value = position, new_value
+
+            beta = min(beta, best_value)
 
             # Cutting off
             if beta <= alpha:
                 break
-        return value, best_move
+
+        return best_value, best_move
 
 
 def _next_move(board, max_level=1):
