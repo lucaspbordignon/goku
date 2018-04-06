@@ -1,3 +1,4 @@
+import enum
 import numpy as np
 
 BOARD_SIZE = 15

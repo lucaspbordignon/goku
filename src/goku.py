@@ -4,10 +4,11 @@ import time
 import enum
 import logging
 import math
-import numba
 import numpy as np
+from typing import Tuple
 from constants import BOARD_SIZE
 from transposition import TranspositionTable
+import utils
 
 
 @contextlib.contextmanager
@@ -23,68 +24,6 @@ def timed(fn):
         with _timed():
             return fn(*args, **kwargs)
     return wrapper
-
-
-@numba.jit
-def window(iterable, size):
-    for i in range(len(iterable) - size + 1):
-        yield iterable[i:i + size]
-
-@numba.jit(nopython=True)
-def _find(pattern, board):
-    def _array_equal(a, b):
-        for x, y in zip(a, b):
-            if x.item() != y.item():
-                return False
-        return True
-
-    def _sum(iterable, start=0):
-        for i in iterable:
-            start += i
-        return start
-
-    height, _ = board.shape
-    pattern_len = len(pattern)
-    def count_row(board):
-        return _sum(_array_equal(c, pattern)
-                for row in board
-                for c in window(row, pattern_len))
-
-    def count_diag(board):
-        edge = height - pattern_len
-        return _sum(_array_equal(c, pattern)
-                for i in range(-edge, edge + 1)
-                for c in window(board.diagonal(i), pattern_len))
-
-    return (
-        # Search for the rows
-        count_row(board) +
-
-        # Search for the columns
-        count_row(np.transpose(board)) +
-
-        # Search for the first diagonal direction with at least length elements
-        count_diag(board) +
-
-        # Search for the other direction
-        count_diag(np.fliplr(board))
-    )
-
-
-def find_doublets(symbol, board):
-    return _find(2, symbol, board)
-
-
-def find_triplets(symbol, board):
-    return _find(3, symbol, board)
-
-
-def find_quartets(symbol, board):
-    return _find(4, symbol, board)
-
-
-def find_quintuplets(symbol, board):
-    return _find(5, symbol, board)
 
 
 def find_all_pieces(symbol, board):
@@ -155,30 +94,30 @@ def _spiral_index(side):
 def _possible_next_moves(board, player):
     """Generate next possible movement for board and player
 
-    >>> moves = _possible_next_moves(np.full((3, 3), '.'), 'X')
-    >>> next(moves, 'X')
-    array([['.', '.', '.'],
-           ['.', 'X', '.'],
-           ['.', '.', '.']], dtype='<U1')
-    >>> next(moves, 'X')
-    array([['X', '.', '.'],
-           ['.', '.', '.'],
-           ['.', '.', '.']], dtype='<U1')
-    >>> next(moves, 'X')
-    array([['.', 'X', '.'],
-           ['.', '.', '.'],
-           ['.', '.', '.']], dtype='<U1')
+    >>> moves = _possible_next_moves(np.full((3, 3), 0), 0)
+    >>> next(moves, 0)
+    array([[0, 0, 0],
+           [0, 0, 0],
+           [0, 0, 0]], dtype='<U1')
+    >>> next(moves, 0)
+    array([[0, 0, 0],
+           [0, 0, 0],
+           [0, 0, 0]], dtype='<U1')
+    >>> next(moves, 0)
+    array([[0, 0, 0],
+           [0, 0, 0],
+           [0, 0, 0]], dtype='<U1')
 
-    >>> moves = _possible_next_moves(np.full((15, 15), '.'), 'X')
+    >>> moves = _possible_next_moves(np.full((15, 15), 0), 0)
     >>> first, *_, last = moves
     >>> first[6:9, 6:9]
-    array([['.', '.', '.'],
-           ['.', 'X', '.'],
-           ['.', '.', '.']], dtype='<U1')
+    array([[0, 0, 0],
+           [0, 0, 0],
+           [0, 0, 0]], dtype='<U1')
     >>> last[0:3, 0:3]
-    array([['.', '.', '.'],
-           ['X', '.', '.'],
-           ['.', '.', '.']], dtype='<U1')
+    array([[0, 0, 0],
+           [0, 0, 0],
+           [0, 0, 0]], dtype='<U1')
     >>> next(moves)
     Traceback (most recent call last):
         ...
@@ -187,28 +126,26 @@ def _possible_next_moves(board, player):
     height, width = board.shape
     assert height == width
     for x, y in _spiral_index(height):
-        if board[x, y] == '.':
+        if board[x, y] == None:
             move = np.copy(board)
             move[x, y] = player
             yield (x, y), move
 
 
-LENGTH_FACTOR = 5
-
 def _evaluate(board, player, opponent):
 
     def find_pattern(pattern):
-        return _find(pattern, board)
+        return utils.find(pattern, board)
 
     def score(player, opponent):
-        open_doublet = np.array(['.', player, player, '.'])
-        closed_doublet = np.array([opponent, player, player, '.'])
+        open_doublet = np.array([None, player, player, None])
+        closed_doublet = np.array([opponent, player, player, None])
 
-        open_triplet = np.array(['.', player, player, player, '.'])
-        closed_triplet = np.array([opponent, player, player, player, '.'])
+        open_triplet = np.array([None, player, player, player, None])
+        closed_triplet = np.array([opponent, player, player, player, None])
 
-        open_quadruplet = np.array(['.', player, player, player, player, '.'])
-        closed_quadruplet = np.array([opponent, player, player, player, player, '.'])
+        open_quadruplet = np.array([None, player, player, player, player, None])
+        closed_quadruplet = np.array([opponent, player, player, player, player, None])
 
         quintuplet = np.array([player, player, player, player, player])
 
@@ -220,27 +157,22 @@ def _evaluate(board, player, opponent):
                 100 * (find_pattern(closed_quadruplet) + find_pattern(closed_quadruplet[::-1])) + \
                 10000 * find_pattern(quintuplet)
 
-    return score(player, opponent) - score(opponent, player)
+    return score(player, opponent) - 2 * score(opponent, player)
 
 
-OPPONENT_MAP = {
-        'G': 'X',
-        'X': 'G',
-        }
-def minimax(board, depth, maximizing, player, alpha=-math.inf, beta=math.inf):
+def minimax(board, depth, maximizing, player, opponent, alpha=-math.inf, beta=math.inf):
     """
         Minimax algorith with alpha-beta prunning. Must return not only the
     node value, but the next movement coordinates.
     """
     # Leaf node
     if depth == 0:
-        return (_evaluate(board, player, OPPONENT_MAP[player]), ())
+        return (_evaluate(board, player, opponent), ())
 
-    # if current_player == 'G':
     if maximizing:
         best_move, best_value = tuple(), -math.inf
-        for position, state in _possible_next_moves(board, 'G'):
-            new_value, _ = minimax(state, depth - 1, False, 'X', alpha, beta)
+        for position, state in _possible_next_moves(board, player):
+            new_value, _ = minimax(state, depth - 1, False, player, opponent, alpha, beta)
 
             if new_value > best_value:
                 best_move, best_value = position, new_value
@@ -254,8 +186,8 @@ def minimax(board, depth, maximizing, player, alpha=-math.inf, beta=math.inf):
         return best_value, best_move
     else:
         best_move, best_value = tuple(), math.inf
-        for position, state in _possible_next_moves(board, 'X'):
-            new_value, _ = minimax(state, depth - 1, True, 'G', alpha, beta)
+        for position, state in _possible_next_moves(board, opponent):
+            new_value, _ = minimax(state, depth - 1, True, player, opponent, alpha, beta)
 
             if new_value > best_value:
                 best_move, best_value = position, new_value
@@ -269,8 +201,8 @@ def minimax(board, depth, maximizing, player, alpha=-math.inf, beta=math.inf):
         return best_value, best_move
 
 
-def _next_move(board, depth):
-    value, position = minimax(board, depth, True, 'G')
+def _next_move(board, depth, index, opponent_index):
+    value, position = minimax(board, depth, 1, True, index, opponent_index)
     return position
 
 
@@ -281,8 +213,10 @@ class Goku:
     pruning
     """
 
-    def __init__(self):
+    def __init__(self, index, opponent_index):
         self._transposition_table = TranspositionTable()
+        self.index = index
+        self.opponent_index = opponent_index
 
     @timed
     def next_move(self, board, max_level=3):
@@ -290,42 +224,7 @@ class Goku:
             Makes the search and returns the coordinates for the best move
         found. Should be the only function to be called externally.
         """
-        return _next_move(board, max_level)
-        # value, position = self.minimax(board, max_level=max_level)
-        # return position
-
-    def all_movement_possibilities(self, board):
-        # Makes : spiral, starting from the center
-        repeating_positions = False
-        central_index = BOARD_SIZE // 2
-        current_position = np.array([central_index, central_index])
-        current_direction = Direction.RIGHT
-        change_move_count = 1
-        current_move_count = 1
-        local_count = 2
-
-        while not repeating_positions:
-            if board[current_position] != '.':
-                current_move_count -= 1
-            else:
-                yield current_position
-                current_move_count -= 1
-
-            x, y = current_position
-            current_position += DIRECTION_DELTA[current_direction]
-
-            if BOARD_SIZE in current_position:
-                repeating_positions = True
-
-            if current_move_count == 0:
-                local_count -= 1
-                if local_count == 0:
-                    local_count = 2
-                    change_move_count += 1
-
-                current_move_count = change_move_count
-
-                current_direction = (current_direction + 1) % len(Direction)
+        return _next_move(board, max_level, self.index, self.opponent_index)
 
 
 if __name__ == "__main__":
