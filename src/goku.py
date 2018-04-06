@@ -1,6 +1,7 @@
 import math
 import numpy as np
 from constants import BOARD_SIZE
+from transposition import TranspositionTable
 
 
 def window(iterable, size):
@@ -60,6 +61,9 @@ class Goku:
     pruning
     """
 
+    def __init__(self):
+        self._transposition_table = TranspositionTable()
+
     def next_move(self, board, max_level=3):
         """
             Makes the search and returns the coordinates for the best move
@@ -88,11 +92,16 @@ class Goku:
             for movement in self.all_movement_possibilities(board):
                 next_board = np.copy(board)
                 next_board[movement] = current_player
-                minimax, _ = self.minimax(next_board,
-                                          alpha,
-                                          beta,
-                                          'X',
-                                          max_level - 1)
+                hash_key = self._transposition_table.hash_key(next_board)
+                if self._transposition_table.contains(hash_key):
+                    minimax = self._transposition_table.value(hash_key)
+                else:
+                    minimax, _ = self.minimax(next_board,
+                                              alpha,
+                                              beta,
+                                              'X',
+                                              max_level - 1)
+                    self._transposition_table.insert(hash_key, minimax)
                 if minimax > value:
                     value = minimax
                     best_movement = movement
@@ -107,11 +116,16 @@ class Goku:
             for movement in self.all_movement_possibilities(board):
                 next_board = np.copy(board)
                 next_board[movement] = current_player
-                minimax, _ = self.minimax(next_board,
-                                          beta,
-                                          alpha,
-                                          'G',
-                                          max_level - 1)
+                hash_key = self._transposition_table.hash_key(next_board)
+                if self._transposition_table.contains(hash_key):
+                    minimax = self._transposition_table.value(hash_key)
+                else:
+                    minimax, _ = self.minimax(next_board,
+                                              beta,
+                                              alpha,
+                                              'G',
+                                              max_level - 1)
+                    self._transposition_table.insert(hash_key, minimax)
                 if minimax < value:
                     value = minimax
                     best_movement = movement
@@ -123,16 +137,59 @@ class Goku:
             return value, best_movement
 
     def all_movement_possibilities(self, board):
-        for item in np.argwhere(board == '.'):
-            yield tuple(item)
+        # Makes a spiral, starting from the center
+        repeating_positions = False
+        central_index = BOARD_SIZE // 2
+        current_position = (central_index, central_index)
+        current_direction = 'RIGHT'
+        change_move_count = 1
+        current_move_count = 1
+        local_count = 2
+
+        while not repeating_positions:
+            if board[current_position] != '.':
+                current_move_count -= 1
+            else:
+                yield current_position
+                current_move_count -= 1
+
+            x, y = current_position
+            if current_direction == 'LEFT':
+                current_position = (x - 1, y)
+            elif current_direction == 'RIGHT':
+                current_position = (x + 1, y)
+            elif current_direction == 'UP':
+                current_position = (x, y - 1)
+            elif current_direction == 'DOWN':
+                current_position = (x, y + 1)
+
+            if BOARD_SIZE in current_position:
+                repeating_positions = True
+
+            if current_move_count == 0:
+                local_count -= 1
+                if local_count == 0:
+                    local_count = 2
+                    change_move_count += 1
+
+                current_move_count = change_move_count
+
+                if current_direction == 'LEFT':
+                    current_direction = 'UP'
+                elif current_direction == 'RIGHT':
+                    current_direction = 'DOWN'
+                elif current_direction == 'UP':
+                    current_direction = 'RIGHT'
+                elif current_direction == 'DOWN':
+                    current_direction = 'LEFT'
 
     def heuristic(self, board):
         postive_factor = (find_doubles('G', board) +
-                          150 * find_triples('G', board) +
-                          95 * find_quartets('G', board))
+                          150 * (find_triples('G', board) +
+                          95 * find_quartets('G', board)))
         negative_factor = (find_doubles('X', board) +
-                           150 * find_triples('X', board) +
-                           95 * find_quartets('X', board))
+                           150 * (find_triples('X', board) +
+                           95 * find_quartets('X', board)))
 
         adversarial_pieces = find_all_pieces('X', board)/(BOARD_SIZE**2)
         return postive_factor - adversarial_pieces * negative_factor
