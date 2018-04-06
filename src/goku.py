@@ -4,6 +4,7 @@ import time
 import enum
 import logging
 import math
+import numba
 import numpy as np
 from constants import BOARD_SIZE
 from transposition import TranspositionTable
@@ -24,24 +25,36 @@ def timed(fn):
     return wrapper
 
 
+@numba.jit
 def window(iterable, size):
     for i in range(len(iterable) - size + 1):
         yield iterable[i:i + size]
 
-
+@numba.jit(nopython=True)
 def _find(pattern, board):
+    def _array_equal(a, b):
+        for x, y in zip(a, b):
+            if x.item() != y.item():
+                return False
+        return True
+
+    def _sum(iterable, start=0):
+        for i in iterable:
+            start += i
+        return start
+
     height, _ = board.shape
     pattern_len = len(pattern)
     def count_row(board):
-        return sum(np.array_equal(c, pattern)
+        return _sum(_array_equal(c, pattern)
                 for row in board
                 for c in window(row, pattern_len))
 
     def count_diag(board):
         edge = height - pattern_len
-        return sum(np.array_equal(c, pattern)
-                   for i in range(-edge, edge + 1)
-                   for c in window(board.diagonal(i), pattern_len))
+        return _sum(_array_equal(c, pattern)
+                for i in range(-edge, edge + 1)
+                for c in window(board.diagonal(i), pattern_len))
 
     return (
         # Search for the rows
