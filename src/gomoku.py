@@ -1,6 +1,5 @@
 import numpy as np
 import regex as re
-import time
 
 from constants import BOARD_SIZE, INITIAL_BOARD, INITIAL_MENU, WIN_REGEX
 from goku import Goku
@@ -44,12 +43,10 @@ class Gomoku:
 
         while not self._winner:
             try:
-                start = time.time()
                 move = self._render_game(mode)
                 if not self._mark_board(self._actual_player, move):
                     print('Position already in use or out of the board!')
                     continue
-                print('Execution time: %f' % (time.time() - start))
                 self._toggle_player()
                 self._winner = self._game_finished()
             except ValueError:
