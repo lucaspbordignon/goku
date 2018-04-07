@@ -1,57 +1,13 @@
 import math
 import numpy as np
 from constants import BOARD_SIZE
+from constants import DIRECTION_ENUM
+from utils import spiral_new_direction
+from utils import sum_tuples
+from utils import find_doublets
+from utils import find_triplets
+from utils import find_quartets
 from transposition import TranspositionTable
-
-
-def window(iterable, size):
-    for i in range(len(iterable) - size + 1):
-        yield iterable[i:i + size]
-
-
-def find(length, symbol, board):
-    pattern = np.array([symbol] * length)
-
-    def count_row(board):
-        return sum(np.array_equal(c, pattern)
-                   for row in board
-                   for c in window(row, length))
-
-    def count_diag(board):
-        edge = BOARD_SIZE - length
-        return sum(np.array_equal(c, pattern)
-                   for i in range(-edge, edge + 1)
-                   for c in window(board.diagonal(i), length))
-
-    return (
-        # Search for the rows
-        count_row(board) +
-
-        # Search for the columns
-        count_row(np.transpose(board)) +
-
-        # Search for the first diagonal direction with at least length elements
-        count_diag(board) +
-
-        # Search for the other direction
-        count_diag(np.fliplr(board))
-    )
-
-
-def find_doubles(symbol, board):
-    return find(2, symbol, board)
-
-
-def find_triples(symbol, board):
-    return find(3, symbol, board)
-
-
-def find_quartets(symbol, board):
-    return find(4, symbol, board)
-
-
-def find_all_pieces(symbol, board):
-    return len(np.where(board == symbol))
 
 
 class Goku:
@@ -64,7 +20,7 @@ class Goku:
     def __init__(self):
         self._transposition_table = TranspositionTable()
 
-    def next_move(self, board, max_level=3):
+    def next_move(self, board, max_level=4):
         """
             Makes the search and returns the coordinates for the best move
         found. Should be the only function to be called externally.
@@ -76,7 +32,7 @@ class Goku:
                 alpha=-math.inf,
                 beta=math.inf,
                 current_player='G',
-                max_level=3):
+                max_level=4):
         """
             Minimax algorith with alpha-beta prunning. Must return not only the
         node value, but the next movement coordinates.
@@ -137,59 +93,48 @@ class Goku:
             return value, best_movement
 
     def all_movement_possibilities(self, board):
-        # Makes a spiral, starting from the center
+        """
+            Makes a spiral movement through the board, starting from the center
+        """
         repeating_positions = False
         central_index = BOARD_SIZE // 2
         current_position = (central_index, central_index)
-        current_direction = 'RIGHT'
+        current_direction = 'DOWN'
         change_move_count = 1
         current_move_count = 1
         local_count = 2
 
         while not repeating_positions:
-            if board[current_position] != '.':
-                current_move_count -= 1
-            else:
-                yield current_position
-                current_move_count -= 1
+            current_move_count -= 1
 
-            x, y = current_position
-            if current_direction == 'LEFT':
-                current_position = (x - 1, y)
-            elif current_direction == 'RIGHT':
-                current_position = (x + 1, y)
-            elif current_direction == 'UP':
-                current_position = (x, y - 1)
-            elif current_direction == 'DOWN':
-                current_position = (x, y + 1)
+            if board[current_position] == '.':
+                yield current_position
+
+            current_position = sum_tuples(current_position,
+                                          DIRECTION_ENUM[current_direction])
 
             if BOARD_SIZE in current_position:
                 repeating_positions = True
 
             if current_move_count == 0:
                 local_count -= 1
-                if local_count == 0:
+                if not local_count:
                     local_count = 2
                     change_move_count += 1
 
                 current_move_count = change_move_count
-
-                if current_direction == 'LEFT':
-                    current_direction = 'UP'
-                elif current_direction == 'RIGHT':
-                    current_direction = 'DOWN'
-                elif current_direction == 'UP':
-                    current_direction = 'RIGHT'
-                elif current_direction == 'DOWN':
-                    current_direction = 'LEFT'
+                current_direction = spiral_new_direction(current_direction)
 
     def heuristic(self, board):
-        postive_factor = (find_doubles('G', board) +
-                          150 * (find_triples('G', board) +
+        """
+            The heuristic for the Goku agent. An estimative of how close
+        we are to win the game, cause is the only thing that matters!
+        """
+        postive_factor = (find_doublets('G', board) +
+                          150 * (find_triplets('G', board) +
                           95 * find_quartets('G', board)))
-        negative_factor = (find_doubles('X', board) +
-                           150 * (find_triples('X', board) +
+        negative_factor = (find_doublets('X', board) +
+                           150 * (find_triplets('X', board) +
                            95 * find_quartets('X', board)))
 
-        adversarial_pieces = find_all_pieces('X', board)/(BOARD_SIZE**2)
-        return postive_factor - adversarial_pieces * negative_factor
+        return postive_factor - 0.5 * negative_factor
