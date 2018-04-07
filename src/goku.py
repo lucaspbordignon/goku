@@ -6,7 +6,7 @@ import logging
 import math
 import numpy as np
 from typing import Tuple
-from constants import BOARD_SIZE, Player
+from constants import BOARD_SIZE
 from transposition import TranspositionTable
 import utils
 
