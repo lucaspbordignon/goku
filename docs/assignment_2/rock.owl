@@ -110,7 +110,7 @@
 
     <owl:ObjectProperty rdf:about="http://www.semanticweb.org/ranieri/ontologies/2018/3/untitled-ontology-4#member_of">
         <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topObjectProperty"/>
-        <rdfs:domain rdf:resource="http://www.semanticweb.org/ranieri/ontologies/2018/3/untitled-ontology-4#band_member"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/ranieri/ontologies/2018/3/untitled-ontology-4#musician"/>
         <rdfs:range rdf:resource="http://www.semanticweb.org/ranieri/ontologies/2018/3/untitled-ontology-4#bands"/>
     </owl:ObjectProperty>
     
@@ -170,14 +170,6 @@
     
 
 
-    <!-- http://www.semanticweb.org/ranieri/ontologies/2018/3/untitled-ontology-4#band_member -->
-
-    <owl:Class rdf:about="http://www.semanticweb.org/ranieri/ontologies/2018/3/untitled-ontology-4#band_member">
-        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/ranieri/ontologies/2018/3/untitled-ontology-4#person"/>
-    </owl:Class>
-    
-
-
     <!-- http://www.semanticweb.org/ranieri/ontologies/2018/3/untitled-ontology-4#bands -->
 
     <owl:Class rdf:about="http://www.semanticweb.org/ranieri/ontologies/2018/3/untitled-ontology-4#bands">
@@ -185,7 +177,7 @@
             <owl:Restriction>
                 <owl:onProperty rdf:resource="http://www.semanticweb.org/ranieri/ontologies/2018/3/untitled-ontology-4#contains_member"/>
                 <owl:minQualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger">1</owl:minQualifiedCardinality>
-                <owl:onClass rdf:resource="http://www.semanticweb.org/ranieri/ontologies/2018/3/untitled-ontology-4#band_member"/>
+                <owl:onClass rdf:resource="http://www.semanticweb.org/ranieri/ontologies/2018/3/untitled-ontology-4#musician"/>
             </owl:Restriction>
         </owl:equivalentClass>
     </owl:Class>
@@ -520,6 +512,25 @@
     
 
 
+    <!-- http://www.semanticweb.org/ranieri/ontologies/2018/3/untitled-ontology-4#musician -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/ranieri/ontologies/2018/3/untitled-ontology-4#musician">
+        <rdfs:subClassOf>
+            <owl:Class>
+                <owl:intersectionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="http://www.semanticweb.org/ranieri/ontologies/2018/3/untitled-ontology-4#person"/>
+                    <owl:Restriction>
+                        <owl:onProperty rdf:resource="http://www.semanticweb.org/ranieri/ontologies/2018/3/untitled-ontology-4#plays"/>
+                        <owl:minQualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger">1</owl:minQualifiedCardinality>
+                        <owl:onClass rdf:resource="http://www.semanticweb.org/ranieri/ontologies/2018/3/untitled-ontology-4#instrument"/>
+                    </owl:Restriction>
+                </owl:intersectionOf>
+            </owl:Class>
+        </rdfs:subClassOf>
+    </owl:Class>
+    
+
+
     <!-- http://www.semanticweb.org/ranieri/ontologies/2018/3/untitled-ontology-4#nx_zero_shirt -->
 
     <owl:Class rdf:about="http://www.semanticweb.org/ranieri/ontologies/2018/3/untitled-ontology-4#nx_zero_shirt">
@@ -630,6 +641,14 @@
     
 
 
+    <!-- http://www.semanticweb.org/ranieri/ontologies/2018/3/untitled-ontology-4#primordial -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/ranieri/ontologies/2018/3/untitled-ontology-4#primordial">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/ranieri/ontologies/2018/3/untitled-ontology-4#bands"/>
+    </owl:Class>
+    
+
+
     <!-- http://www.semanticweb.org/ranieri/ontologies/2018/3/untitled-ontology-4#pulse -->
 
     <owl:Class rdf:about="http://www.semanticweb.org/ranieri/ontologies/2018/3/untitled-ontology-4#pulse">
@@ -718,18 +737,20 @@
 
     <owl:Class rdf:about="http://www.semanticweb.org/ranieri/ontologies/2018/3/untitled-ontology-4#vocals">
         <owl:equivalentClass>
-            <owl:Restriction>
-                <owl:onProperty rdf:resource="http://www.semanticweb.org/ranieri/ontologies/2018/3/untitled-ontology-4#melts"/>
-                <owl:minQualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger">1</owl:minQualifiedCardinality>
-                <owl:onClass rdf:resource="http://www.semanticweb.org/ranieri/ontologies/2018/3/untitled-ontology-4#heart"/>
-            </owl:Restriction>
-        </owl:equivalentClass>
-        <owl:equivalentClass>
-            <owl:Restriction>
-                <owl:onProperty rdf:resource="http://www.semanticweb.org/ranieri/ontologies/2018/3/untitled-ontology-4#played_by"/>
-                <owl:qualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger">0</owl:qualifiedCardinality>
-                <owl:onClass rdf:resource="http://www.semanticweb.org/ranieri/ontologies/2018/3/untitled-ontology-4#single_man"/>
-            </owl:Restriction>
+            <owl:Class>
+                <owl:intersectionOf rdf:parseType="Collection">
+                    <owl:Restriction>
+                        <owl:onProperty rdf:resource="http://www.semanticweb.org/ranieri/ontologies/2018/3/untitled-ontology-4#melts"/>
+                        <owl:minQualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger">1</owl:minQualifiedCardinality>
+                        <owl:onClass rdf:resource="http://www.semanticweb.org/ranieri/ontologies/2018/3/untitled-ontology-4#heart"/>
+                    </owl:Restriction>
+                    <owl:Restriction>
+                        <owl:onProperty rdf:resource="http://www.semanticweb.org/ranieri/ontologies/2018/3/untitled-ontology-4#played_by"/>
+                        <owl:qualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger">0</owl:qualifiedCardinality>
+                        <owl:onClass rdf:resource="http://www.semanticweb.org/ranieri/ontologies/2018/3/untitled-ontology-4#single_man"/>
+                    </owl:Restriction>
+                </owl:intersectionOf>
+            </owl:Class>
         </owl:equivalentClass>
         <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/ranieri/ontologies/2018/3/untitled-ontology-4#instrument"/>
     </owl:Class>
@@ -750,56 +771,9 @@
     <!-- http://www.semanticweb.org/ranieri/ontologies/2018/3/untitled-ontology-4#Anthony_Kiedis -->
 
     <owl:NamedIndividual rdf:about="http://www.semanticweb.org/ranieri/ontologies/2018/3/untitled-ontology-4#Anthony_Kiedis">
-        <rdf:type rdf:resource="http://www.semanticweb.org/ranieri/ontologies/2018/3/untitled-ontology-4#red_hot_chilli_peppers"/>
-    </owl:NamedIndividual>
-    
-
-
-    <!-- http://www.semanticweb.org/ranieri/ontologies/2018/3/untitled-ontology-4#Chad_Smith -->
-
-    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/ranieri/ontologies/2018/3/untitled-ontology-4#Chad_Smith">
-        <rdf:type rdf:resource="http://www.semanticweb.org/ranieri/ontologies/2018/3/untitled-ontology-4#red_hot_chilli_peppers"/>
-    </owl:NamedIndividual>
-    
-
-
-    <!-- http://www.semanticweb.org/ranieri/ontologies/2018/3/untitled-ontology-4#Flea -->
-
-    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/ranieri/ontologies/2018/3/untitled-ontology-4#Flea">
-        <rdf:type rdf:resource="http://www.semanticweb.org/ranieri/ontologies/2018/3/untitled-ontology-4#red_hot_chilli_peppers"/>
-    </owl:NamedIndividual>
-    
-
-
-    <!-- http://www.semanticweb.org/ranieri/ontologies/2018/3/untitled-ontology-4#Jimmy_Page -->
-
-    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/ranieri/ontologies/2018/3/untitled-ontology-4#Jimmy_Page">
-        <rdf:type rdf:resource="http://www.semanticweb.org/ranieri/ontologies/2018/3/untitled-ontology-4#led_zeppelin"/>
-    </owl:NamedIndividual>
-    
-
-
-    <!-- http://www.semanticweb.org/ranieri/ontologies/2018/3/untitled-ontology-4#John_Bonham -->
-
-    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/ranieri/ontologies/2018/3/untitled-ontology-4#John_Bonham">
-        <rdf:type rdf:resource="http://www.semanticweb.org/ranieri/ontologies/2018/3/untitled-ontology-4#led_zeppelin"/>
-        <dont_dress rdf:resource="http://www.semanticweb.org/ranieri/ontologies/2018/3/untitled-ontology-4#Flea"/>
-    </owl:NamedIndividual>
-    
-
-
-    <!-- http://www.semanticweb.org/ranieri/ontologies/2018/3/untitled-ontology-4#John_Paul_Jones -->
-
-    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/ranieri/ontologies/2018/3/untitled-ontology-4#John_Paul_Jones">
-        <rdf:type rdf:resource="http://www.semanticweb.org/ranieri/ontologies/2018/3/untitled-ontology-4#led_zeppelin"/>
-    </owl:NamedIndividual>
-    
-
-
-    <!-- http://www.semanticweb.org/ranieri/ontologies/2018/3/untitled-ontology-4#Josh_Klinghoffer -->
-
-    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/ranieri/ontologies/2018/3/untitled-ontology-4#Josh_Klinghoffer">
-        <rdf:type rdf:resource="http://www.semanticweb.org/ranieri/ontologies/2018/3/untitled-ontology-4#red_hot_chilli_peppers"/>
+        <rdf:type rdf:resource="http://www.semanticweb.org/ranieri/ontologies/2018/3/untitled-ontology-4#musician"/>
+        <member_of rdf:resource="http://www.semanticweb.org/ranieri/ontologies/2018/3/untitled-ontology-4#red_hot_chilli_peppers"/>
+        <plays rdf:resource="http://www.semanticweb.org/ranieri/ontologies/2018/3/untitled-ontology-4#vocals"/>
     </owl:NamedIndividual>
     
 
@@ -807,15 +781,151 @@
     <!-- http://www.semanticweb.org/ranieri/ontologies/2018/3/untitled-ontology-4#Ranieri -->
 
     <owl:NamedIndividual rdf:about="http://www.semanticweb.org/ranieri/ontologies/2018/3/untitled-ontology-4#Ranieri">
-        <rdf:type rdf:resource="http://www.semanticweb.org/ranieri/ontologies/2018/3/untitled-ontology-4#person"/>
+        <rdf:type rdf:resource="http://www.semanticweb.org/ranieri/ontologies/2018/3/untitled-ontology-4#moicano"/>
     </owl:NamedIndividual>
     
 
 
-    <!-- http://www.semanticweb.org/ranieri/ontologies/2018/3/untitled-ontology-4#Robert_Plant -->
+    <!-- http://www.semanticweb.org/ranieri/ontologies/2018/3/untitled-ontology-4#bass -->
 
-    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/ranieri/ontologies/2018/3/untitled-ontology-4#Robert_Plant">
-        <rdf:type rdf:resource="http://www.semanticweb.org/ranieri/ontologies/2018/3/untitled-ontology-4#led_zeppelin"/>
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/ranieri/ontologies/2018/3/untitled-ontology-4#bass">
+        <rdf:type rdf:resource="http://www.semanticweb.org/ranieri/ontologies/2018/3/untitled-ontology-4#bass"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/ranieri/ontologies/2018/3/untitled-ontology-4#chad_smith -->
+
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/ranieri/ontologies/2018/3/untitled-ontology-4#chad_smith">
+        <rdf:type rdf:resource="http://www.semanticweb.org/ranieri/ontologies/2018/3/untitled-ontology-4#musician"/>
+        <plays rdf:resource="http://www.semanticweb.org/ranieri/ontologies/2018/3/untitled-ontology-4#drums"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/ranieri/ontologies/2018/3/untitled-ontology-4#ciáran_macuiliam -->
+
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/ranieri/ontologies/2018/3/untitled-ontology-4#ciáran_macuiliam">
+        <rdf:type rdf:resource="http://www.semanticweb.org/ranieri/ontologies/2018/3/untitled-ontology-4#primordial"/>
+        <member_of rdf:resource="http://www.semanticweb.org/ranieri/ontologies/2018/3/untitled-ontology-4#primordial"/>
+        <plays rdf:resource="http://www.semanticweb.org/ranieri/ontologies/2018/3/untitled-ontology-4#vocals"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/ranieri/ontologies/2018/3/untitled-ontology-4#drums -->
+
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/ranieri/ontologies/2018/3/untitled-ontology-4#drums">
+        <rdf:type rdf:resource="http://www.semanticweb.org/ranieri/ontologies/2018/3/untitled-ontology-4#drums"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/ranieri/ontologies/2018/3/untitled-ontology-4#flea -->
+
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/ranieri/ontologies/2018/3/untitled-ontology-4#flea">
+        <rdf:type rdf:resource="http://www.semanticweb.org/ranieri/ontologies/2018/3/untitled-ontology-4#musician"/>
+        <member_of rdf:resource="http://www.semanticweb.org/ranieri/ontologies/2018/3/untitled-ontology-4#red_hot_chilli_peppers"/>
+        <plays rdf:resource="http://www.semanticweb.org/ranieri/ontologies/2018/3/untitled-ontology-4#bass"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/ranieri/ontologies/2018/3/untitled-ontology-4#guitar -->
+
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/ranieri/ontologies/2018/3/untitled-ontology-4#guitar">
+        <rdf:type rdf:resource="http://www.semanticweb.org/ranieri/ontologies/2018/3/untitled-ontology-4#guitar"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/ranieri/ontologies/2018/3/untitled-ontology-4#jimmy_page -->
+
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/ranieri/ontologies/2018/3/untitled-ontology-4#jimmy_page">
+        <rdf:type rdf:resource="http://www.semanticweb.org/ranieri/ontologies/2018/3/untitled-ontology-4#bands"/>
+        <member_of rdf:resource="http://www.semanticweb.org/ranieri/ontologies/2018/3/untitled-ontology-4#led_zeppelin"/>
+        <plays rdf:resource="http://www.semanticweb.org/ranieri/ontologies/2018/3/untitled-ontology-4#guitar"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/ranieri/ontologies/2018/3/untitled-ontology-4#john_bonham -->
+
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/ranieri/ontologies/2018/3/untitled-ontology-4#john_bonham">
+        <rdf:type rdf:resource="http://www.semanticweb.org/ranieri/ontologies/2018/3/untitled-ontology-4#musician"/>
+        <member_of rdf:resource="http://www.semanticweb.org/ranieri/ontologies/2018/3/untitled-ontology-4#led_zeppelin"/>
+        <plays rdf:resource="http://www.semanticweb.org/ranieri/ontologies/2018/3/untitled-ontology-4#drums"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/ranieri/ontologies/2018/3/untitled-ontology-4#john_paul_jones -->
+
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/ranieri/ontologies/2018/3/untitled-ontology-4#john_paul_jones">
+        <rdf:type rdf:resource="http://www.semanticweb.org/ranieri/ontologies/2018/3/untitled-ontology-4#musician"/>
+        <member_of rdf:resource="http://www.semanticweb.org/ranieri/ontologies/2018/3/untitled-ontology-4#led_zeppelin"/>
+        <plays rdf:resource="http://www.semanticweb.org/ranieri/ontologies/2018/3/untitled-ontology-4#bass"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/ranieri/ontologies/2018/3/untitled-ontology-4#josh_klinghoffer -->
+
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/ranieri/ontologies/2018/3/untitled-ontology-4#josh_klinghoffer">
+        <rdf:type rdf:resource="http://www.semanticweb.org/ranieri/ontologies/2018/3/untitled-ontology-4#musician"/>
+        <member_of rdf:resource="http://www.semanticweb.org/ranieri/ontologies/2018/3/untitled-ontology-4#red_hot_chilli_peppers"/>
+        <plays rdf:resource="http://www.semanticweb.org/ranieri/ontologies/2018/3/untitled-ontology-4#guitar"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/ranieri/ontologies/2018/3/untitled-ontology-4#led_zeppelin -->
+
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/ranieri/ontologies/2018/3/untitled-ontology-4#led_zeppelin">
+        <rdf:type rdf:resource="http://www.semanticweb.org/ranieri/ontologies/2018/3/untitled-ontology-4#bands"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/ranieri/ontologies/2018/3/untitled-ontology-4#primordial -->
+
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/ranieri/ontologies/2018/3/untitled-ontology-4#primordial">
+        <rdf:type rdf:resource="http://www.semanticweb.org/ranieri/ontologies/2018/3/untitled-ontology-4#bands"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/ranieri/ontologies/2018/3/untitled-ontology-4#red_hot_chilli_peppers -->
+
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/ranieri/ontologies/2018/3/untitled-ontology-4#red_hot_chilli_peppers">
+        <rdf:type rdf:resource="http://www.semanticweb.org/ranieri/ontologies/2018/3/untitled-ontology-4#bands"/>
+        <member_of rdf:resource="http://www.semanticweb.org/ranieri/ontologies/2018/3/untitled-ontology-4#red_hot_chilli_peppers"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/ranieri/ontologies/2018/3/untitled-ontology-4#robert_plant -->
+
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/ranieri/ontologies/2018/3/untitled-ontology-4#robert_plant">
+        <rdf:type rdf:resource="http://www.semanticweb.org/ranieri/ontologies/2018/3/untitled-ontology-4#musician"/>
+        <member_of rdf:resource="http://www.semanticweb.org/ranieri/ontologies/2018/3/untitled-ontology-4#led_zeppelin"/>
+        <plays rdf:resource="http://www.semanticweb.org/ranieri/ontologies/2018/3/untitled-ontology-4#vocals"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/ranieri/ontologies/2018/3/untitled-ontology-4#vocals -->
+
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/ranieri/ontologies/2018/3/untitled-ontology-4#vocals">
+        <rdf:type rdf:resource="http://www.semanticweb.org/ranieri/ontologies/2018/3/untitled-ontology-4#vocals"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/ranieri/ontologies/2018/3/untitled-ontology-4#micheál_o&apos;floinn -->
+
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/ranieri/ontologies/2018/3/untitled-ontology-4#micheál_o&apos;floinn">
+        <rdf:type rdf:resource="http://www.semanticweb.org/ranieri/ontologies/2018/3/untitled-ontology-4#primordial"/>
     </owl:NamedIndividual>
     
 
@@ -831,11 +941,17 @@
     <rdf:Description>
         <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AllDisjointClasses"/>
         <owl:members rdf:parseType="Collection">
+            <rdf:Description rdf:about="http://www.semanticweb.org/ranieri/ontologies/2018/3/untitled-ontology-4#black_metal"/>
+            <rdf:Description rdf:about="http://www.semanticweb.org/ranieri/ontologies/2018/3/untitled-ontology-4#emo_rock"/>
             <rdf:Description rdf:about="http://www.semanticweb.org/ranieri/ontologies/2018/3/untitled-ontology-4#folk_rock"/>
             <rdf:Description rdf:about="http://www.semanticweb.org/ranieri/ontologies/2018/3/untitled-ontology-4#grunge"/>
             <rdf:Description rdf:about="http://www.semanticweb.org/ranieri/ontologies/2018/3/untitled-ontology-4#hard_rock"/>
             <rdf:Description rdf:about="http://www.semanticweb.org/ranieri/ontologies/2018/3/untitled-ontology-4#heavy_metal"/>
+            <rdf:Description rdf:about="http://www.semanticweb.org/ranieri/ontologies/2018/3/untitled-ontology-4#indie_rock"/>
+            <rdf:Description rdf:about="http://www.semanticweb.org/ranieri/ontologies/2018/3/untitled-ontology-4#irish_metal"/>
+            <rdf:Description rdf:about="http://www.semanticweb.org/ranieri/ontologies/2018/3/untitled-ontology-4#pop_rock"/>
             <rdf:Description rdf:about="http://www.semanticweb.org/ranieri/ontologies/2018/3/untitled-ontology-4#power_metal"/>
+            <rdf:Description rdf:about="http://www.semanticweb.org/ranieri/ontologies/2018/3/untitled-ontology-4#punk_rock"/>
         </owl:members>
     </rdf:Description>
 </rdf:RDF>
