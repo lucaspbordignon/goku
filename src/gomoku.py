@@ -1,8 +1,8 @@
-
 import numpy as np
 import regex as re
 
 from constants import BOARD_SIZE, INITIAL_BOARD, INITIAL_MENU, WIN_REGEX
+from goku import Goku
 
 
 class Gomoku:
@@ -20,6 +20,7 @@ class Gomoku:
             2: 'G'  # Goku, the AI agent
         }
         self._actual_player = 0
+        self._ai_agent = Goku()
 
     def run(self):
         self.render()
@@ -28,14 +29,18 @@ class Gomoku:
         try:
             if not skip_menu:
                 self._render_menu()
-            self.game_mode = int(input('>>> '))
-            if self.game_mode != 0:
-                self._start_game(self.game_mode)
+                self._game_mode = int(input('>>> '))
+            if self._game_mode != 0:
+                self._start_game(self._game_mode)
         except ValueError:
             print('\nThe given option was not a number!')
             self.render(skip_menu=True)
 
     def _start_game(self, mode=1):
+        # Starting with the AI
+        if mode == 2:
+            self._actual_player = 2
+
         while not self._winner:
             try:
                 move = self._render_game(mode)
@@ -47,6 +52,7 @@ class Gomoku:
             except ValueError:
                 print('\nOption(s) is(are) not number(s). Try again!')
                 self._winner = False
+        self._render_board()
         print('We have a winner')
 
     def _render_menu(self):
@@ -56,11 +62,15 @@ class Gomoku:
 
     def _render_game(self, mode):
         self._render_board()
-        print('Type the ROW to put your piece:')
-        row = input('>>> ')
-        print('Type the COLUMN to put your piece:')
-        col = input('>>> ')
-        return(int(row), int(col))
+        if self._actual_player == 2:
+            print("It is AI's turn!")
+            return self._ai_agent.next_move(self._board)
+        else:
+            print('Type the ROW to put your piece:')
+            row = input('>>> ')
+            print('Type the COLUMN to put your piece:')
+            col = input('>>> ')
+            return(int(row), int(col))
 
     def _render_board(self):
         """
@@ -129,12 +139,15 @@ class Gomoku:
         return None
 
     def _toggle_player(self):
-        self._actual_player = 0 if self._actual_player else 1
+        if self._game_mode == 2:
+            self._actual_player = 0 if self._actual_player else 2
+        else:
+            self._actual_player = 0 if self._actual_player else 1
 
     def _mark_board(self, player, position):
         if not self._valid_position(position) or self._board[position] != '.':
             return False
-        self._board[position] = self._players[self._actual_player]
+        self._board[position] = self._players[player]
         return True
 
     def _game_finished(self):
